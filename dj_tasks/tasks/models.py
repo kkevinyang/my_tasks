@@ -4,12 +4,19 @@ from django.contrib.auth.models import User
 
 
 class Task(models.Model):
+    # STATUS_CHOICES = (
+    #     ('running', 'RUNNING'),
+    #     ('stop', 'STOP'),
+    #     ('todo', 'TODO'),
+    #     ('done', 'DONE'),
+    # )
+
     STATUS_CHOICES = (
-        ('running', 'RUNNING'),
+        ('open', 'OPEN'),
         ('stop', 'STOP'),
-        ('todo', 'TODO'),
-        ('done', 'DONE'),
+        ('delete', 'DELETE'),
     )
+
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250,
                             unique_for_date='publish')
@@ -24,7 +31,7 @@ class Task(models.Model):
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10,
                               choices=STATUS_CHOICES,
-                              default='todo')
+                              default='open')
 
     class Meta:
         ordering = ('-publish',)
