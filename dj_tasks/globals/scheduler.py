@@ -10,11 +10,11 @@ scheduler = None
 
 
 def init_func():
-    print time.strftime('%Y-%m-%d %H:%M:%S')
+    print(time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
 def init_scheduler():
-    print '开始初始化scheduler...'
+    print('开始初始化scheduler...')
     global scheduler
     # print 'scheduler:', scheduler
     lock = threading.Lock()  # TIP 多线程同步代码

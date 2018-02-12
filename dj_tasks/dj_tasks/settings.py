@@ -44,9 +44,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_crontab',
+    # 'django_crontab',
     'tasks',
-    'django_apscheduler'
+    # 'django_apscheduler'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -96,7 +96,8 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 # LANGUAGE_CODE = 'en-us'
-LANGUAGE_CODE = "zh-hans"
+# LANGUAGE_CODE = "zh-hans"
+LANGUAGE_CODE = 'zh-CN'
 
 
 TIME_ZONE = 'Asia/Shanghai'
