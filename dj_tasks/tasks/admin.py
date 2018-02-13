@@ -38,15 +38,21 @@ class TaskAdmin(admin.ModelAdmin):
             print('is_superuser')
             # qs.list_display = ('name', 'owner', 'start', 'end', 'publish', 'colored_status')
             return qs
-        # self.readonly_fields = ('owner',)
+        self.readonly_fields = ('owner',)
         # self.owner = request.user
-        print('user:', request.user)
+        # print('user:', request.user)
         return qs.filter(owner=User.objects.filter(username=request.user))
 
     def get_readonly_fields(self, request, obj=None):
+        """设置只读字段"""
+        print('get_readonly_fields...')
+
         if request.user.is_superuser:
             return ['publish']
         else:
+            # if obj is no  None:
+            #     return s lf.readonly_fields + ('owner', 'publish')
+            # return self. eadonly_fields
             # return ['publish', 'owner']
             return ['publish']
 
@@ -77,9 +83,7 @@ class TaskAdmin(admin.ModelAdmin):
         return super(TaskAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
-        """
-        点击保存时调用
-        """
+        """点击保存时调用"""
         print('save_model...')
 
         if change:
@@ -107,19 +111,39 @@ class TaskAdmin(admin.ModelAdmin):
         # super(TaskAdmin, self).save_model(request, obj, form, change)
 
     def add_view(self, request, form_url='', extra_context=None):
+        """点击add时调用"""
         print('add_view...')
         # pdb.set_trace()
         print('request.user:', request.user.username)
+
+        # source = User.objects.get(id=source_id)
+        g = request.GET.copy()
+        g['owner'] = request.user
+        # g.update({
+        #     'title': source.title,
+        #     'contents': source.description + u"... \n\n[" + source.url + "]",
+        # })
+
+        request.GET = g
         # request.GET.owner = request.user.username
         return super(TaskAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
-    def get_form(self, request, *args, **kwargs):
-        print('get_form...')
-        form = super(TaskAdmin, self).get_form(request, *args, **kwargs)
-        # pdb.set_trace()
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        """对外键进行设置"""
+        print('formfield_for_foreignkey...')
+        print('db_field.name:', db_field.name)
+        if db_field.name == 'owner':
+            kwargs['initial'] = request.user.id
+            kwargs['queryset'] = User.objects.filter(username=request.user.username)
+        return super(TaskAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
 
-        form.owner = request.user
-        return form
+    # def get_form(self, request, *args, **kwargs):
+    #     print('get_form...')
+    #     form = super(TaskAdmin, self).get_form(request, *args, **kwargs)
+    #     # pdb.set_trace()
+    #     return form
 
     # def formfield_for_dbfield(self, db_field, **kwargs):
     #     # print('formfield_for_dbfield...')
