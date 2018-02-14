@@ -22,8 +22,8 @@ class Task(models.Model):
     )
 
     name = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250,
-                            unique_for_date='publish')
+    # slug = models.SlugField(max_length=250,
+    #                         unique_for_date='publish')
     owner = models.ForeignKey(User, null=True, blank=True)
     # owner = models.CharField(default='anonymous', max_length=128, editable=False)
     body = models.TextField()
@@ -54,13 +54,12 @@ class Task(models.Model):
 
     def save(self, *args, **kwargs):
         """重写model的save()"""
-        print('save...')
+        # print('save...')
         super(Task, self).save(*args, **kwargs)  # Call the "real" save() method.
 
     def clean(self):
-        print('clean...')
-
-        print('body:', len(self.body))
+        # print('clean...')
+        # print('body:', len(self.body))
         self.body = self.body.strip()
         if len(self.body) < 1:
             raise ValidationError('the sql is too short')

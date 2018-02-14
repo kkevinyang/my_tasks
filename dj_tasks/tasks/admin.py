@@ -18,12 +18,12 @@ def add_task(sql_body):
 
 class TaskAdmin(admin.ModelAdmin):
 
-    # list_display = ('name', 'owner', 'start', 'end', 'publish', 'colored_status')
-    list_display = ('name', 'start', 'end', 'publish', 'colored_status')
+    list_display = ('name', 'owner', 'start', 'end', 'publish', 'colored_status')
+    # list_display = ('name', 'slug', 'start', 'end', 'publish', 'colored_status')
 
     list_filter = ('status', 'created', 'publish', 'owner')
     search_fields = ('name', 'body')
-    prepopulated_fields = {'slug': ('name',)}  # prepopulated_fields属性告诉Django通过输入的标题来填充slug字段
+    # prepopulated_fields = {'slug': ('name',)}  # prepopulated_fields属性告诉Django通过输入的标题来填充slug字段
     # raw_id_fields = ('owner',)
     date_hierarchy = 'publish'
     ordering = ['status', '-publish']  # 可排序方式
@@ -45,7 +45,7 @@ class TaskAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         """设置只读字段"""
-        print('get_readonly_fields...')
+        # print('get_readonly_fields...')
 
         if request.user.is_superuser:
             return ['publish']
@@ -56,35 +56,35 @@ class TaskAdmin(admin.ModelAdmin):
             # return ['publish', 'owner']
             return ['publish']
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        """
-        覆盖原生函数：修改已经创建的表时才调用
-        """
-        print('change_view...')
-
-        # def get_readonly_fields(request, obj=None):
-        #     """重新定义此函数，限制普通用户所能修改的字段"""
-        #     if request.user.is_superuser:
-        #         self.readonly_fields = ['publish']
-        #     elif hasattr(obj, 'is_sure'):
-        #         if obj.is_sure:
-        #             self.readonly_fields = ('project_name', 'to_mail', 'data_selected', 'frequency', 'start_date',
-        #                                     'end_date')
-        #     else:
-        #         # pdb.set_trace()
-        #         self.owner = User.objects.filter(pk=object_id)
-        #         self.readonly_fields = ('publish', 'owner')
-        #
-        #     return self.readonly_fields
-        #
-        # change_obj = Task.objects.filter(pk=object_id)
-        # print('change_obj:', change_obj)
-        # get_readonly_fields(request, obj=change_obj)
-        return super(TaskAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
+    # def change_view(self, request, object_id, form_url='', extra_context=None):
+    #     """
+    #     覆盖原生函数：修改已经创建的表时才调用
+    #     """
+    #     print('change_view...')
+    #
+    #     def get_readonly_fields(request, obj=None):
+    #         """重新定义此函数，限制普通用户所能修改的字段"""
+    #         if request.user.is_superuser:
+    #             self.readonly_fields = ['publish']
+    #         elif hasattr(obj, 'is_sure'):
+    #             if obj.is_sure:
+    #                 self.readonly_fields = ('project_name', 'to_mail', 'data_selected', 'frequency', 'start_date',
+    #                                         'end_date')
+    #         else:
+    #             # pdb.set_trace()
+    #             self.owner = User.objects.filter(pk=object_id)
+    #             self.readonly_fields = ('publish', 'owner')
+    #
+    #         return self.readonly_fields
+    #
+    #     change_obj = Task.objects.filter(pk=object_id)
+    #     print('change_obj:', change_obj)
+    #     get_readonly_fields(request, obj=change_obj)
+    #     return super(TaskAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
         """点击保存时调用"""
-        print('save_model...')
+        # print('save_model...')
 
         if change:
             # 修改task
@@ -94,47 +94,32 @@ class TaskAdmin(admin.ModelAdmin):
             # 新增task
             print('save_model--add')
             sql_body = request.POST.get('body')
-            # obj.owner = request.user.username
-            pdb.set_trace()
 
-            # if getattr(obj, 'owner', None) is None:
-            #     # obj.owner = request.user.username
-            obj.owner = request.user.username
-
-            obj.save()
-            # obj.last_modified_by = request.user
             if sql_body:
                 print('新增了sql任务:', sql_body)
                 job = scheduler.add_job(add_task, 'interval', minutes=1, args=[sql_body])
                 print('job4:', job)
 
-        # super(TaskAdmin, self).save_model(request, obj, form, change)
+        super(TaskAdmin, self).save_model(request, obj, form, change)
 
     def add_view(self, request, form_url='', extra_context=None):
         """点击add时调用"""
         print('add_view...')
-        # pdb.set_trace()
-        print('request.user:', request.user.username)
 
-        # source = User.objects.get(id=source_id)
         g = request.GET.copy()
         g['owner'] = request.user
-        # g.update({
-        #     'title': source.title,
-        #     'contents': source.description + u"... \n\n[" + source.url + "]",
-        # })
-
         request.GET = g
-        # request.GET.owner = request.user.username
+
         return super(TaskAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
         """对外键进行设置"""
-        print('formfield_for_foreignkey...')
-        print('db_field.name:', db_field.name)
+        # print('formfield_for_foreignkey...')
+        # print('db_field.name:', db_field.name)
         if db_field.name == 'owner':
             kwargs['initial'] = request.user.id
-            kwargs['queryset'] = User.objects.filter(username=request.user.username)
+            if not request.user.is_superuser:
+                kwargs['queryset'] = User.objects.filter(username=request.user.username)
         return super(TaskAdmin, self).formfield_for_foreignkey(
             db_field, request, **kwargs
         )
