@@ -3,7 +3,7 @@
 import pdb
 
 from django.contrib import admin
-from .models import Task
+from .models import Task, SQL, Biz, Type, Metric
 # from dj_tasks.scheduler import scheduler
 # from dj_tasks.urls import scheduler
 from globals.scheduler import scheduler
@@ -16,11 +16,41 @@ def add_task(sql_body):
     print('sql_body:', sql_body)
 
 
+class SqlAdmin(admin.ModelAdmin):
+    list_display = ('test_sql_name', 'owner', 'body', 'description')
+    ordering = ['-inserttime']
+    readonly_fields = ['inserttime']
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        """对外键进行设置"""
+        if db_field.name == 'owner':
+            kwargs['initial'] = request.user.id
+            if not request.user.is_superuser:
+                kwargs['queryset'] = User.objects.filter(username=request.user.username)
+        return super(SqlAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
+
+
+class MetricAdmin(admin.ModelAdmin):
+    list_display = ('metric_name', 'owner', 'body', 'description')
+    ordering = ['-inserttime']
+    readonly_fields = ['inserttime']
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        """对外键进行设置"""
+        if db_field.name == 'owner':
+            kwargs['initial'] = request.user.id
+            if not request.user.is_superuser:
+                kwargs['queryset'] = User.objects.filter(username=request.user.username)
+        return super(MetricAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
+
+
 class TaskAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'owner', 'start', 'end', 'publish', 'colored_status')
-    # list_display = ('name', 'slug', 'start', 'end', 'publish', 'colored_status')
-
     list_filter = ('status', 'created', 'publish', 'owner')
     search_fields = ('name', 'body')
     # prepopulated_fields = {'slug': ('name',)}  # prepopulated_fields属性告诉Django通过输入的标题来填充slug字段
@@ -145,3 +175,8 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Task, TaskAdmin)
+admin.site.register(SQL, SqlAdmin)
+admin.site.register(Metric, MetricAdmin)
+admin.site.register(Biz)
+admin.site.register(Type)
+

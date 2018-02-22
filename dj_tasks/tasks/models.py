@@ -7,35 +7,63 @@ from django.utils.html import format_html
 from django.core.exceptions import ValidationError
 
 
-class Task(models.Model):
-    # STATUS_CHOICES = (
-    #     ('running', 'RUNNING'),
-    #     ('stop', 'STOP'),
-    #     ('todo', 'TODO'),
-    #     ('done', 'DONE'),
-    # )
+class SQL(models.Model):
+    test_sql_name = models.CharField(max_length=250, verbose_name='SQL名称')
+    owner = models.ForeignKey(User, verbose_name='创建人', null=True, blank=True)
+    body = models.TextField(verbose_name='SQL内容')
+    description = models.TextField(verbose_name='SQL简介', null=True, blank=True)
+    inserttime = models.DateTimeField(default=timezone.now)
+    updatetime = models.DateTimeField(auto_now=True)
+    isactive = models.BooleanField(default=False)
 
+
+class Metric(models.Model):
+    metric_name = models.CharField(max_length=250, verbose_name='指标名称')
+    owner = models.ForeignKey(User, verbose_name='创建人', null=True, blank=True)
+    body = models.TextField(verbose_name='指标的SQL内容')
+    description = models.TextField(verbose_name='指标简介', null=True, blank=True)
+    inserttime = models.DateTimeField(default=timezone.now)
+    updatetime = models.DateTimeField(auto_now=True)
+    isactive = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.metric_name
+
+
+class Biz(models.Model):
+    biz_name = models.CharField(max_length=250, verbose_name='业务线名称')
+    description = models.TextField(verbose_name='业务线简介', null=True, blank=True)
+    inserttime = models.DateTimeField(default=timezone.now)
+    updatetime = models.DateTimeField(auto_now=True)
+    isactive = models.BooleanField(default=False)
+
+
+class Type(models.Model):
+    type_name = models.CharField(max_length=250, verbose_name='类型名称')
+    description = models.TextField(verbose_name='类型简介', null=True, blank=True)
+    inserttime = models.DateTimeField(default=timezone.now)
+    updatetime = models.DateTimeField(auto_now=True)
+    isactive = models.BooleanField(default=False)
+
+
+class Task(models.Model):
     STATUS_CHOICES = (
         ('open', 'OPEN'),
         ('stop', 'STOP'),
         ('delete', 'DELETE'),
     )
-
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, verbose_name='任务名称')
     # slug = models.SlugField(max_length=250,
     #                         unique_for_date='publish')
-    owner = models.ForeignKey(User, null=True, blank=True)
-    # owner = models.CharField(default='anonymous', max_length=128, editable=False)
-    body = models.TextField()
-    start = models.DateTimeField(default=timezone.now)
-    end = models.DateTimeField(default=timezone.now)
-
+    owner = models.ForeignKey(User, verbose_name='创建人', null=True, blank=True)
+    body = models.TextField(verbose_name='要跑的SQL')
+    start = models.DateTimeField(default=timezone.now, verbose_name='开始时间')
+    end = models.DateTimeField(default=timezone.now, verbose_name='结束时间')
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=10,
-                              choices=STATUS_CHOICES,
-                              default='open')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='open', verbose_name='任务状态')
+    metric = models.ManyToManyField(Metric, verbose_name='指标', null=True, blank=True)
 
     def colored_status(self):
         """增加需要渲染颜色的字段"""
@@ -69,4 +97,3 @@ class Task(models.Model):
 
     def __str__(self):
         return self.name
-

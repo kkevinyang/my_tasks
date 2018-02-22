@@ -4,7 +4,7 @@ from django.contrib import admin
 
 urlpatterns = [
     # Examples:
-    # url(r'^$', 'dj_tasks.views.home', name='home'),
+    url(r'^$', include('app.urls', namespace="blog")),
     # url(r'^blog/', include('blog.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     # url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS

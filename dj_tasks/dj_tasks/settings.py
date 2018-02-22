@@ -46,6 +46,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # 'django_crontab',
     'tasks',
+    'django_celery_results',
+    'app'
     # 'django_apscheduler'
 )
 
