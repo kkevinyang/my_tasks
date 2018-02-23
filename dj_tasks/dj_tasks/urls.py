@@ -1,10 +1,12 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 
 urlpatterns = [
     # Examples:
-    url(r'^$', include('app.urls', namespace="blog")),
+    # url(r'^$', include('app.urls', namespace="blog")),
+    url(r'^$', TemplateView.as_view(template_name="index.html")),
     # url(r'^blog/', include('blog.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     # url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS

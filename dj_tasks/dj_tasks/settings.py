@@ -64,10 +64,14 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'dj_tasks.urls'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "appfront/dist/static"),
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['appfront/dist'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
