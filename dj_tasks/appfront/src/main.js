@@ -3,13 +3,25 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import ElementUI from 'element-ui'
+import axios from 'axios';
+import VueResource from 'vue-resource'
+import 'element-ui/lib/theme-chalk/index.css';    // 默认主题
 
-Vue.config.productionTip = false
+Vue.use(ElementUI);
+Vue.use(VueResource);
+Vue.prototype.$axios = axios;
+Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
+// new Vue({
+//   el: '#app',
+//   router,
+//   components: { App },
+//   template: '<App/>'
+// })
+
 new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  template: '<App/>'
-})
+    router,
+    render: h => h(App)
+}).$mount('#app');
